@@ -24,7 +24,7 @@ public class SeckillInventoryListener {
     public void handleSeckillInventoryMessage(SeckillInventoryDealDTO inventoryDealDTO, Message message, Channel channel) throws IOException {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            goodsService.updateGoodsInventory(inventoryDealDTO.getGoodsId(), inventoryDealDTO.getCount());
+            goodsService.updateGoodsInfo(inventoryDealDTO.getGoodsId(), inventoryDealDTO.getCount());
             // 消费成功，手动ack
             channel.basicAck(deliveryTag, false);
         } catch (Exception e) {

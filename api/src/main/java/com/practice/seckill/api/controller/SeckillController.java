@@ -35,7 +35,7 @@ public class SeckillController {
     @PostMapping("/item/{seckillId}")
     @ApiOperation(value = "秒杀下单", notes = "秒杀下单")
     public ReturnResponse seckillItem(@PathVariable Long seckillId, @RequestBody SeckillParameterDTO parameterDTO) throws Exception {
-        // 秒杀成功，返回订单号
+        // 秒杀成功，返回订单
         SeckillOrderDTO orderDTO = seckillService.seckillItem(parameterDTO);
         return ReturnResponse.ok(orderDTO);
     }

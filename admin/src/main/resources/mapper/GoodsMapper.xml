@@ -70,7 +70,7 @@
         </where>
         order by id desc
     </select>
-    <select id="selectGoodsInfoAndLock" parameterType="java.lang.Long"
+    <select id="selectGoodsInventoryAndLock" parameterType="java.lang.Long"
             resultType="java.lang.Integer">
         select inventory
         from goods
@@ -81,13 +81,23 @@
         </where>
         FOR UPDATE
     </select>
-
+    <select id="selectGoodsSalesAndLock" parameterType="java.lang.Long"
+            resultType="java.lang.Integer">
+        select sales
+        from goods
+        <where>
+            <if test="goodsId != null and goodsId != ''">
+                and id = #{goodsId}
+            </if>
+        </where>
+        FOR UPDATE
+    </select>
     <select id="getMaxId" resultType="long">
         select max(id) from goods
     </select>
-    <update id="updateInventoryById">
+    <update id="updateInventoryAndSalesById">
         UPDATE goods
-        SET inventory=#{newInventory}
+        SET inventory=#{newInventory}, sales=#{newSales}
         WHERE id = #{goodsId}
     </update>
 </mapper>

@@ -81,6 +81,6 @@ public interface GoodsService extends BaseMapper<Goods> {
      * @param goodsId
      * @return Boolean
      */
-    void updateGoodsInventory(Long goodsId, Integer count);
+    void updateGoodsInfo(Long goodsId, Integer count);
 
 }

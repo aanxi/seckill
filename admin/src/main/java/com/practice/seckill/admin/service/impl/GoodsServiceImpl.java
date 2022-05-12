@@ -112,9 +112,10 @@ public class GoodsServiceImpl  implements GoodsService {
     }
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
-    public void updateGoodsInventory(Long goodsId, Integer count) {
-        int newInventory = goodsMapper.selectGoodsInfoAndLock(goodsId) - count;
-        goodsMapper.updateInventoryById(goodsId, newInventory);
+    public void updateGoodsInfo(Long goodsId, Integer count) {
+        int newInventory = goodsMapper.selectGoodsInventoryAndLock(goodsId) - count;
+        int newSales = goodsMapper.selectGoodsSalesAndLock(goodsId) + count;
+        goodsMapper.updateInventoryAndSalesById(goodsId, newInventory, newSales);
     }
 
     @Override

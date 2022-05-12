@@ -45,7 +45,7 @@ public class OrderServiceImpl implements OrderService {
                 .createAt(LocalDateTime.now())
                 .build();
         orderMapper.insert(order);
-        //通过消息队列完成扣减库存，防止拖慢创建订单的速度,并且使用悲观锁更新库存，防止出现数据不一致
+        //通过消息队列完成库存扣减和销量更新，防止拖慢创建订单的速度,使用悲观锁更新，防止出现数据不一致
         SeckillInventoryDealDTO inventoryDealDTO = SeckillInventoryDealDTO.builder()
                 .goodsId(seckillOrderDTO.getGoodsId())
                 .count(seckillOrderDTO.getGoodsNumber())
@@ -58,14 +58,6 @@ public class OrderServiceImpl implements OrderService {
             rabbitTemplate.convertAndSend(OrderConstant.ORDER_EVENT_EXCHANGE, OrderConstant.ORDER_SECKILL_INVENTORY_DEAL_QUEUE_ROUTING_KEY, inventoryDealDTO);
             log.warn("发送库存扣减消息到交换机失败");
         }
-        //订单创建完成
-//        try {
-//            //convertAndSend(…)：使用此方法，交换机会马上把所有的信息都交给所有的消费者，消费者再自行处理，不会因为消费者处理慢而阻塞线程。
-//            rabbitTemplate.convertAndSend(OrderConstant.ORDER_EVENT_EXCHANGE, OrderConstant.ORDER_CREATE_ROUTING_KEY, order);
-//        } catch (AmqpException e) {
-//            log.warn("向mq发送订单新创建消息失败，自动重试一次");
-//            rabbitTemplate.convertAndSend(OrderConstant.ORDER_EVENT_EXCHANGE, OrderConstant.ORDER_CREATE_ROUTING_KEY, order);
-//        }
         return true;
     }
 
