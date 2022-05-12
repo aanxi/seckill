@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.practice.seckill.admin.mapper.GoodsMapper">
+    <resultMap id="BaseResultMap" type="com.practice.seckill.common.entity.Goods">
+        <!--@mbg.generated-->
+        <!--@Table goods-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="price" jdbcType="DOUBLE" property="price"/>
+        <result column="image_id" jdbcType="BIGINT" property="userType"/>
+        <result column="category_id" jdbcType="BIGINT" property="userType"/>
+        <result column="inventory" jdbcType="INTEGER" property="inventory"/>
+        <result column="sales" jdbcType="INTEGER" property="sales"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="recommended" jdbcType="TINYINT" property="recommended"/>
+        <result column="created_by" jdbcType="VARCHAR" property="updatedBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="deleted" jdbcType="TINYINT" property="deleted"/>
+    </resultMap>
+    <resultMap type="com.practice.seckill.admin.vo.GoodsRowVO" id="GoodsRowVOMap">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="price" jdbcType="DOUBLE" property="price"/>
+        <!--        <result column="image_id" jdbcType="BIGINT" property="userType" />-->
+        <!--        <result column="category_id" jdbcType="BIGINT" property="userType" />-->
+        <result column="inventory" jdbcType="INTEGER" property="inventory"/>
+        <result column="sales" jdbcType="INTEGER" property="sales"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="recommended" jdbcType="TINYINT" property="recommended"/>
+        <result column="created_by" jdbcType="VARCHAR" property="createdBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="category_name" jdbcType="VARCHAR" property="categoryName"/>
+        <result column="image_link" jdbcType="VARCHAR" property="imageUrl"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        id, `name`, price, image_id, category_id, inventory, sales, status, recommended, created_by, create_time, deleted
+    </sql>
+
+    <select id="listGoods" resultMap="GoodsRowVOMap">
+        select g.id, g.`name`, g.price, i.link image_link , c.`name` category_name, g.inventory, g.sales, g.status,
+        g.recommended, g.created_by, g.create_time
+        from (goods g inner join goods_category c on g.category_id = c.id) inner join goods_image i on g.image_id = i.id
+        <where>
+            <if test="categoryId != null and categoryId != 0">
+                and g.category_id = #{categoryId}
+            </if>
+            <if test="goodsName != null and goodsName != ''">
+                and g.`name` like CONCAT('%', #{goodsName}, '%')
+            </if>
+            <if test="priceLowerBound  != null and priceLowerBound != ''">
+                and g.price > #{priceLowerBound}
+            </if>
+            <if test="priceUpperBound  != null and priceUpperBound != ''">
+                and g.price > #{priceUpperBound}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and g.create_time > #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and #{endTime} > g.create_time
+            </if>
+            <if test="goodsStatus != null and goodsStatus != 2">
+                and g.status = #{goodsStatus}
+            </if>
+            <if test="recommended != null and recommended != 2">
+                and g.recommended = #{recommended}
+            </if>
+        </where>
+        order by id desc
+    </select>
+    <select id="selectGoodsInfoAndLock" parameterType="java.lang.Long"
+            resultType="java.lang.Integer">
+        select inventory
+        from goods
+        <where>
+            <if test="goodsId != null and goodsId != ''">
+                and id = #{goodsId}
+            </if>
+        </where>
+        FOR UPDATE
+    </select>
+
+    <select id="getMaxId" resultType="long">
+        select max(id) from goods
+    </select>
+    <update id="updateInventoryById">
+        UPDATE goods
+        SET inventory=#{newInventory}
+        WHERE id = #{goodsId}
+    </update>
+</mapper>

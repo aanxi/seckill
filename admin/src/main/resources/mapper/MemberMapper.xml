@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.practice.seckill.admin.mapper.MemberMapper">
+    <resultMap type="com.practice.seckill.admin.vo.MemberRowVO" id="MemberRowVOMap">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="head_img_url" jdbcType="VARCHAR" property="headImgUrl"/>
+        <result column="nickname" jdbcType="VARCHAR" property="nickname"/>
+        <result column="phone_number" jdbcType="VARCHAR" property="phoneNumber"/>
+        <result column="district" jdbcType="VARCHAR" property="district"/>
+        <result column="lock_status" jdbcType="TINYINT" property="lockStatus"/>
+        <result column="create_at" jdbcType="TIMESTAMP" property="createAt"/>
+        <result column="order_number" jdbcType="INTEGER" property="orderNumber"/>
+        <result column="consumption_sum" jdbcType="DOUBLE" property="consumptionSum"/>
+    </resultMap>
+
+    <select id="listMember" resultMap="MemberRowVOMap">
+        select m.id, m.head_image_url, m.nickname, m.phone_number, m.district, m.lock_status, m.create_at,
+        o.order_number, o.consumption_sum
+        from member m inner join (select member_id,count(*) order_number ,sum(consumption) consumption_sum from `order`
+        group by member_id) o on m.id = o.member_id
+        <where>
+            <if test="lockStatus!= null">
+                and m.lock_status = #{lockStatus}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and m.create_at > #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and #{endTime} > m.create_at
+            </if>
+            <if test="nickname != null and nickname != ''">
+                and m.nickname like CONCAT(#{nickname}, '%')
+            </if>
+            <if test="phoneNumber != null and phoneNumber != ''">
+                and m.phone_number = #{phoneNumber}
+            </if>
+        </where>
+        order by id desc
+    </select>
+    <select id="getMaxId" resultType="long">
+        select max(id) from member
+    </select>
+</mapper>
