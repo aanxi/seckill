@@ -33,6 +33,8 @@ public class RedissonConfig {
         Config config = new Config();
         String address = "redis://" + host + ":" + port;
         config.useSingleServer().setAddress(address);
+        //设置watchdog每次自动续期时间
+        config.setLockWatchdogTimeout(20);
 //        config.useSingleServer().setPassword(password);
         RedissonClient redisson = Redisson.create(config);
         return redisson;

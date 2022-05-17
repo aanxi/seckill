@@ -28,19 +28,16 @@ public class SeckillGoodsRedisBO {
      * 秒杀价格
      */
     private Double seckillPrice;
-    /**
-     * 秒杀总量
-     */
-    private Integer seckillCount;
+//    /**
+//     * 秒杀总量,另外保存
+//     */
+//    private Integer seckillCount;
 
     /**
      * 秒杀令牌，只有在秒杀活动开始时才会暴露出来，秒杀期间以令牌为准，防止提前消耗
      */
     private String seckillToken;
-//    /**
-//     * 排序
-//     */
-//    private Integer seckillSort;
+
 
     // 秒杀开始时间
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")

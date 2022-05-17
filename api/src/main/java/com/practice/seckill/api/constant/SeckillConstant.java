@@ -9,4 +9,5 @@ public class SeckillConstant {
     public static final String SEMAPHORE_SECKILL_GOODS_STOCK_PREFIX = "seckill:goods:stock:";
     // 用户是否已秒杀此商品
     public static final String SECKILL_USER_ALREADY_EXISTS_PREFIX = "seckill:user:goods:";
+    public static final String LOCK_ORDER_KEY_PREFIX = "lock:order:";
 }

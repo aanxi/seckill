@@ -22,6 +22,8 @@ import com.practice.seckill.common.constant.OrderConstant;
 import com.practice.seckill.common.entity.Goods;
 import com.practice.seckill.common.entity.SeckillAct;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bytecode.Throw;
+import org.redisson.api.RLock;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.AmqpException;
@@ -99,46 +101,67 @@ public class SeckillServiceImpl implements SeckillService {
         }
         BoundHashOperations<String, String, String> ops = stringRedisTemplate.boundHashOps(SeckillConstant.REDIS_SECKILL_GOODS_INFO_KEY);
         //获取秒杀活动相关商品
-        String goodId = stringRedisTemplate.opsForValue().get(SeckillConstant.REDIS_SECKILL_ACT_PREFIX + parameterDTO.getSeckillId());
-        if (!ops.hasKey(parameterDTO.getSeckillId() + "_" + goodId)) {
+        String goodsId = stringRedisTemplate.opsForValue().get(SeckillConstant.REDIS_SECKILL_ACT_PREFIX + parameterDTO.getSeckillId());
+        String inventoryKey = SeckillConstant.REDIS_SECKILL_ACT_PREFIX + parameterDTO.getSeckillId() + "_" + goodsId;
+        if (!ops.hasKey(parameterDTO.getSeckillId() + "_" + goodsId) || !stringRedisTemplate.hasKey(inventoryKey)) {
             throw new Exception("秒杀商品不存在");
         }
         // 校验令牌是否一致
-        String s = ops.get(parameterDTO.getSeckillId() + "_" + goodId);
+        String s = ops.get(parameterDTO.getSeckillId() + "_" + goodsId);
         SeckillGoodsRedisBO redisBO = JSON.parseObject(s, SeckillGoodsRedisBO.class);
         if (!parameterDTO.getSeckillToken().equals(redisBO.getSeckillToken())) {
             throw new Exception("秒杀失败，商品秒杀令牌校验失败");
         }
-        // 校验数量是否合法
-        if (parameterDTO.getCount() > redisBO.getSeckillCount()) {
-            throw new Exception("秒杀失败，购买数量超出数量限制");
+
+//        // 校验该用户是否已秒杀过此商品 seckill:user:sku:场次id_goodsid:用户id
+//        String key = SeckillConstant.SECKILL_USER_ALREADY_EXISTS_PREFIX + parameterDTO.getSeckillId() + "_" + goodsId + ":" + parameterDTO.getMemberId();
+//        String val = parameterDTO.getCount().toString();
+//        // 活动结束自动释放锁
+//        long expire = Duration.between(LocalDateTime.now(),redisBO.getEndTime()).toMillis();
+//        // res为false,用户秒杀过此商品，否则没有秒杀过，保存此用户到redis中，此场活动不能再秒杀
+//        Boolean res = stringRedisTemplate.opsForValue().setIfAbsent(key, val, expire, TimeUnit.MILLISECONDS);
+//        if (!res) {
+//            throw new Exception("秒杀失败，您已秒杀过此商品");
+//        }
+//        // 秒杀
+//        RSemaphore semaphore = redissonClient.getSemaphore(SeckillConstant.SEMAPHORE_SECKILL_GOODS_STOCK_PREFIX + parameterDTO.getSeckillToken());
+//        // 5ms内扣减库存
+//        try {
+//            //尝试获取锁，5MILLISECONDS未获取到则返回false
+//            boolean acquire = semaphore.tryAcquire(parameterDTO.getCount(), 5, TimeUnit.MILLISECONDS);
+//            // 获取到锁，秒杀成功，快速创建订单
+//            if(acquire){
+//                System.out.println("秒杀成功！即将为您创建订单");
+//                return createSeckillOrder(parameterDTO.getMemberId(), redisBO, parameterDTO.getCount());
+//            }else{
+//                throw new Exception("秒杀失败！当前抢购人数过多");
+//            }
+//        } catch (InterruptedException e) {
+//            log.error("秒杀出错：{}", e);
+//            throw new Exception("秒杀失败");
+//        }
+        String lockKey = SeckillConstant.LOCK_ORDER_KEY_PREFIX + parameterDTO.getMemberId();
+        RLock lock = redissonClient.getLock(lockKey);
+        boolean success = lock.tryLock(10, TimeUnit.SECONDS);
+        if(!success) {
+            throw new Exception("秒杀失败，获取锁超时");
         }
-        // 校验该用户是否已秒杀过此商品 seckill:user:sku:场次id_goodsid:用户id
-        String key = SeckillConstant.SECKILL_USER_ALREADY_EXISTS_PREFIX + parameterDTO.getSeckillId() + "_" + goodId + ":" + parameterDTO.getMemberId();
-        String val = parameterDTO.getCount().toString();
-        // 活动结束自动释放锁
-        long expire = Duration.between(LocalDateTime.now(),redisBO.getEndTime()).toMillis();
-        // res为false,用户秒杀过此商品，否则没有秒杀过，保存此用户到redis中，此场活动不能再秒杀
-        Boolean res = stringRedisTemplate.opsForValue().setIfAbsent(key, val, expire, TimeUnit.MILLISECONDS);
-        if (!res) {
-            throw new Exception("秒杀失败，您已秒杀过此商品");
-        }
-        // 秒杀
-        RSemaphore semaphore = redissonClient.getSemaphore(SeckillConstant.SEMAPHORE_SECKILL_GOODS_STOCK_PREFIX + parameterDTO.getSeckillToken());
-        // 5ms内扣减库存
         try {
-            //尝试获取锁，5MILLISECONDS未获取到则返回false
-            boolean acquire = semaphore.tryAcquire(parameterDTO.getCount(), 5, TimeUnit.MILLISECONDS);
-            // 获取到锁，秒杀成功，快速创建订单
-            if(acquire){
-                System.out.println("秒杀成功！即将为您创建订单");
+            // 校验数量是否合法
+            Integer inventory = Integer.valueOf(stringRedisTemplate.opsForValue().get(inventoryKey));
+            log.info("redis库存量："+inventory);
+            //扣减redis库存
+            Long res = stringRedisTemplate.opsForValue().decrement(inventoryKey, parameterDTO.getCount());
+            if(res >= 0) {
                 return createSeckillOrder(parameterDTO.getMemberId(), redisBO, parameterDTO.getCount());
-            }else{
-                throw new Exception("秒杀失败！当前抢购人数过多");
             }
-        } catch (InterruptedException e) {
-            log.error("秒杀出错：{}", e);
-            throw new Exception("秒杀失败");
+            else {
+                throw new Exception("秒杀失败，购买数量超出数量限制");
+            }
+        } finally {
+            if(lock.isLocked() && lock.isHeldByCurrentThread()){ // 是否还是锁定状态
+                lock.unlock(); // 释放锁
+            }
         }
     }
 
@@ -167,23 +190,27 @@ public class SeckillServiceImpl implements SeckillService {
     }
 
     /**
-     * 保存秒杀活动场次信息
-     * key:seckill:session:startTime.toString() + "_" + endTime.toString()
+     * 保存秒杀活动库存信息
+     * key:actId+goodsId  
+     * value:inventory
      */
     private void saveSeckillAct(List<SeckillActDTO> actList) {
         for (SeckillActDTO seckillActDTO : actList) {
             LocalDateTime endTime = seckillActDTO.getEndTime();
             // seckillactid为key
-            String key = SeckillConstant.REDIS_SECKILL_ACT_PREFIX + seckillActDTO.getId();
+            String key1 = SeckillConstant.REDIS_SECKILL_ACT_PREFIX + seckillActDTO.getId();
+            String key2 = SeckillConstant.REDIS_SECKILL_ACT_PREFIX + seckillActDTO.getId() + "_" + seckillActDTO.getGoodsId();
             // 避免重复上架
-            if (stringRedisTemplate.hasKey(key)) {
+            if (stringRedisTemplate.hasKey(key1) || stringRedisTemplate.hasKey(key2)) {
                 continue;
             }
+            stringRedisTemplate.opsForValue().set(key1,seckillActDTO.getGoodsId().toString());
             // 值为当前场次下goodsid，有的sku在多个场次中都有，所以保存成 场次id_goodsid
-            String seckillActGoodsId = seckillActDTO.getGoodsId().toString();
-            stringRedisTemplate.opsForValue().set(key,seckillActGoodsId);
+            String inventory = goodsMapper.selectGoodsInventoryAndLock(seckillActDTO.getGoodsId()).toString();
+            stringRedisTemplate.opsForValue().set(key2,inventory);
             // 设置过期时间，活动结束自动过期,ms
-            stringRedisTemplate.expireAt(key,Date.from(endTime.atZone(ZoneId.systemDefault()).toInstant()));
+            stringRedisTemplate.expireAt(key1,Date.from(endTime.atZone(ZoneId.systemDefault()).toInstant()));
+            stringRedisTemplate.expireAt(key2,Date.from(endTime.atZone(ZoneId.systemDefault()).toInstant()));
         }
     }
 
@@ -208,7 +235,7 @@ public class SeckillServiceImpl implements SeckillService {
             SeckillGoodsRedisBO redisBO = new SeckillGoodsRedisBO();
             redisBO.setId(actDTO.getId());
             redisBO.setGoodsId(actDTO.getGoodsId());
-            redisBO.setSeckillCount(goods.getInventory());
+//            redisBO.setSeckillCount(goods.getInventory());
             redisBO.setSeckillPrice(goods.getPrice());
             // 保存开始结束时间
             redisBO.setBeginTime(actDTO.getBeginTime());
@@ -218,14 +245,14 @@ public class SeckillServiceImpl implements SeckillService {
             redisBO.setSeckillToken(token);
             // 上架当前商品，保存到redis
             ops.put(key, JSON.toJSONString(redisBO));
-            // 库存信号量key
-            String semaphoreKey = SeckillConstant.SEMAPHORE_SECKILL_GOODS_STOCK_PREFIX + token;
-            RSemaphore semaphore = redissonClient.getSemaphore(semaphoreKey);
-            // 设置秒杀库存量为信号量的值，即将信号量同时能够允许获取锁的客户端的数量设置为库存量
-            semaphore.trySetPermits(goods.getInventory());
-            //设置库存信号量过期时间
-            Long expire = Duration.between(LocalDateTime.now(),actDTO.getEndTime()).toMillis();
-            semaphore.expire(expire, TimeUnit.MILLISECONDS);
+//            // 库存信号量key
+//            String semaphoreKey = SeckillConstant.SEMAPHORE_SECKILL_GOODS_STOCK_PREFIX + token;
+//            RSemaphore semaphore = redissonClient.getSemaphore(semaphoreKey);
+//            // 设置秒杀库存量为信号量的值，即将信号量同时能够允许获取锁的客户端的数量设置为库存量
+//            semaphore.trySetPermits(goods.getInventory());
+//            //设置库存信号量过期时间
+//            Long expire = Duration.between(LocalDateTime.now(),actDTO.getEndTime()).toMillis();
+//            semaphore.expire(expire, TimeUnit.MILLISECONDS);
         }
 
     }
