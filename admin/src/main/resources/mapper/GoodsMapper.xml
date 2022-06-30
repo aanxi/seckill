@@ -35,7 +35,8 @@
 
 
     <sql id="Base_Column_List">
-        id, `name`, price, image_id, category_id, inventory, sales, status, recommended, created_by, create_time, deleted
+        id, `name`, price, image_id, category_id, inventory, sales, status, recommended, created_by, create_time,
+        deleted
     </sql>
 
     <select id="listGoods" resultMap="GoodsRowVOMap">

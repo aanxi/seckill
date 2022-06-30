@@ -15,18 +15,18 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class MemberQueryConditionDTO {
-    @ApiModelProperty(value="锁定状态")
+    @ApiModelProperty(value = "锁定状态")
     private Integer lockStatus;
-    @ApiModelProperty(value="时间左界")
+    @ApiModelProperty(value = "时间左界")
     private LocalDateTime startTime;
-    @ApiModelProperty(value="时间右界")
+    @ApiModelProperty(value = "时间右界")
     private LocalDateTime endTime;
-    @ApiModelProperty(value="用户昵称")
+    @ApiModelProperty(value = "用户昵称")
     private String nickname;
-    @ApiModelProperty(value="手机号")
+    @ApiModelProperty(value = "手机号")
     private String phoneNumber;
-    @ApiModelProperty(value="pageNo")
+    @ApiModelProperty(value = "pageNo")
     private Integer pageNo;
-    @ApiModelProperty(value="pageSize")
+    @ApiModelProperty(value = "pageSize")
     private Integer pageSize;
 }

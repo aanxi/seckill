@@ -15,7 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
-@ApiModel(value="秒杀活动表")
+@ApiModel(value = "秒杀活动表")
 @Data
 @Builder
 @AllArgsConstructor
@@ -26,22 +26,22 @@ public class SeckillAct {
      * 秒杀活动ID
      */
     @TableId(value = "id", type = IdType.AUTO)
-    @ApiModelProperty(value="秒杀活动ID")
+    @ApiModelProperty(value = "秒杀活动ID")
     private Long id;
 
     /**
      * 商品ID
      */
     @TableField(value = "goods_id")
-    @ApiModelProperty(value="商品ID")
+    @ApiModelProperty(value = "商品ID")
     private Long goodsId;
 
     /**
      * 秒杀开始时间
      */
     @TableField(value = "begin_time")
-    @ApiModelProperty(value="秒杀开始时间")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "秒杀开始时间")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")  //,timezone=”GMT+8”
     private LocalDateTime beginTime;
 
@@ -49,8 +49,8 @@ public class SeckillAct {
      * 秒杀结束时间
      */
     @TableField(value = "end_time")
-    @ApiModelProperty(value="秒杀结束时间")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "秒杀结束时间")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")  //,timezone=”GMT+8”
     private LocalDateTime endTime;
 
@@ -58,7 +58,7 @@ public class SeckillAct {
      * 启用状态,0:未启用，1：已启用
      */
     @TableField(value = "status")
-    @ApiModelProperty(value="启用状态")
+    @ApiModelProperty(value = "启用状态")
     private Integer status;
 
 }

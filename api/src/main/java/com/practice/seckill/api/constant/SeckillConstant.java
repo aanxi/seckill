@@ -2,7 +2,7 @@ package com.practice.seckill.api.constant;
 
 public class SeckillConstant {
 
-//    public static final String UPLOAD_SKU_LOCK_KEY = "upload_seckill_goods";
+    //    public static final String UPLOAD_SKU_LOCK_KEY = "upload_seckill_goods";
     public static final String REDIS_SECKILL_ACT_PREFIX = "seckill:act:";
     public static final String REDIS_SECKILL_GOODS_INFO_KEY = "seckill:goods:";
     // redisson信号量形式保存库存

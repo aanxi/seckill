@@ -18,7 +18,7 @@ public class WareConstant {
     public enum StockLockStatus {
         LOCKED(1, "已锁定"),
         RELEASED(2, "已释放"),
-        DEDUCTED(3,  "已扣减");
+        DEDUCTED(3, "已扣减");
 
         private int value;
         private String desc;
@@ -32,6 +32,8 @@ public class WareConstant {
             return value;
         }
 
-        public String getDesc() { return desc; }
+        public String getDesc() {
+            return desc;
+        }
     }
 }

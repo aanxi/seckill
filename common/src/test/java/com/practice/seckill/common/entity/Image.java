@@ -12,14 +12,14 @@ public class Image {
      * 图片ID
      */
     @TableId(value = "id", type = IdType.AUTO)
-    @ApiModelProperty(value="图片ID")
+    @ApiModelProperty(value = "图片ID")
     private Long id;
 
     /**
      * 图片链接
      */
     @TableField(value = "link")
-    @ApiModelProperty(value="图片链接")
+    @ApiModelProperty(value = "图片链接")
     private String link;
 
 }

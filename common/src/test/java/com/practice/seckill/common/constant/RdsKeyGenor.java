@@ -27,6 +27,7 @@ public class RdsKeyGenor {
     public static String goodsKey(Long goodsId) {
         return String.format(GOODS_KEY_FORM, goodsId);
     }
+
     public static Duration goodsExpire() {
         return Duration.ofDays(1);
     }
@@ -40,6 +41,7 @@ public class RdsKeyGenor {
     public static String memberKey(Long memberId) {
         return String.format(MEMBER_KEY_FORM, memberId);
     }
+
     public static Duration memberExpire() {
         return Duration.ofDays(1);
     }

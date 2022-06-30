@@ -33,6 +33,7 @@ public class OrderServiceImpl implements OrderService {
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private OrderMapper orderMapper;
+
     @Transactional
     @Override
     public boolean createSeckillOrder(SeckillOrderDTO seckillOrderDTO) {

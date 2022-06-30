@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 public interface OrderService extends BaseMapper<Order> {
     /**
      * 秒杀业务快速下单发过来的消息
+     *
      * @param seckillOrderDTO
      * @return
      */

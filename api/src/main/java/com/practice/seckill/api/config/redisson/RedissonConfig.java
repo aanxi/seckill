@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- *
  * Redisson分布式锁的配置
  */
 @Configuration
@@ -26,6 +25,7 @@ public class RedissonConfig {
 
     /**
      * 基于单节点redis的分布式锁配置
+     *
      * @return
      */
     @Bean

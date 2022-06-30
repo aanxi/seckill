@@ -51,7 +51,7 @@ spring:
         max-idle: 8
         max-wait: -1
         min-idle: 10
-#    password: ''
+    #    password: ''
     port: 6379
     timeout: 10000ms
 

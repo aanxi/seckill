@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/seckill")
+@RequestMapping("/api")
 @Api(value = "秒杀", tags = "秒杀")
 public class SeckillController {
 
@@ -29,6 +29,7 @@ public class SeckillController {
 
     /**
      * 秒杀下单
+     *
      * @param parameterDTO
      * @return
      */

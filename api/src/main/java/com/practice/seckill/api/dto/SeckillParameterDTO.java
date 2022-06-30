@@ -13,15 +13,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class SeckillParameterDTO {
-    @ApiModelProperty(value="用户Id")
+    @ApiModelProperty(value = "用户Id")
     private Long memberId;
 
-    @ApiModelProperty(value="秒杀活动Id")
+    @ApiModelProperty(value = "秒杀活动Id")
     private Long seckillId;
 
-    @ApiModelProperty(value="秒杀令牌")
+    @ApiModelProperty(value = "秒杀令牌")
     private String seckillToken;
 
-    @ApiModelProperty(value="商品数量")
+    @ApiModelProperty(value = "商品数量")
     private Integer count;
 }

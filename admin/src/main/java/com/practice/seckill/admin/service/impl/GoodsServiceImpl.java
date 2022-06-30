@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class GoodsServiceImpl  implements GoodsService {
+public class GoodsServiceImpl implements GoodsService {
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
@@ -79,13 +79,14 @@ public class GoodsServiceImpl  implements GoodsService {
                 .createTime(dto.getCreateTime())
                 .deleted(0)
                 .build();
-        if(goodsMapper.updateById(goods) > 0) {
+        if (goodsMapper.updateById(goods) > 0) {
             //更新缓存
             buildGoodsCacheBO(goods);
             return dto;
         }
         return null;
     }
+
     @Override
     public void deleteGoodsCacheBO(Long goodsId) {
         String redisKey = RdsKeyGenor.goodsKey(goodsId);
@@ -104,12 +105,13 @@ public class GoodsServiceImpl  implements GoodsService {
                 .id(goodsId)
                 .deleted(1)
                 .build();
-        if(goodsMapper.updateById(goods) > 0) {
+        if (goodsMapper.updateById(goods) > 0) {
             deleteGoodsCacheBO(goodsId);
             return true;
         }
         return false;
     }
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public void updateGoodsInfo(Long goodsId, Integer count) {
@@ -129,7 +131,7 @@ public class GoodsServiceImpl  implements GoodsService {
                 dto.getGoodsStatus(),
                 dto.getRecommended()
         );
-        PageVO<GoodsRowVO> page =  new PageVO(dto.getPageNo(), dto.getPageSize(), (long) goodsList.size());
+        PageVO<GoodsRowVO> page = new PageVO(dto.getPageNo(), dto.getPageSize(), (long) goodsList.size());
         page.setRecords(goodsList);
         return page;
     }
@@ -137,7 +139,7 @@ public class GoodsServiceImpl  implements GoodsService {
     @Override
     public GoodsDTO createGoods(GoodsDTO dto) {
         Goods newGoods = Goods.builder()
-                .id(goodsMapper.getMaxId()+1)
+                .id(goodsMapper.getMaxId() + 1)
                 .name(dto.getName())
                 .price(dto.getPrice())
                 .imageId(dto.getImageId())

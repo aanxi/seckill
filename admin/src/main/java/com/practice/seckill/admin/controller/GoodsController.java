@@ -2,7 +2,7 @@ package com.practice.seckill.admin.controller;
 
 
 import com.practice.seckill.admin.dto.GoodsDTO;
-import com.practice.seckill.admin.dto.QueryConditionDTO;
+import com.practice.seckill.admin.dto.GoodsQuery;
 import com.practice.seckill.admin.service.GoodsService;
 import com.practice.seckill.admin.vo.GoodsRowVO;
 import com.practice.seckill.admin.vo.PageVO;
@@ -27,10 +27,11 @@ public class GoodsController {
         GoodsDTO result = goodsService.createGoods(dto);
         return ReturnResponse.ok(result);
     }
+
     @DeleteMapping("/goods/{goodsId}")
     @ApiOperation(value = "移除商品", notes = "移除商品")
     public ReturnResponse<String> deleteGoods(@ApiParam(value = "商品id") @PathVariable("goodsId") Long goodsId) {
-        return goodsService.deleteGoodsById(goodsId)? ReturnResponse.ok("删除成功"):ReturnResponse.makeFailResponse("删除失败");
+        return goodsService.deleteGoodsById(goodsId) ? ReturnResponse.ok("删除成功") : ReturnResponse.makeFailResponse("删除失败");
     }
 
     @PutMapping("/goods/{goodsId}/info")
@@ -42,8 +43,8 @@ public class GoodsController {
 
     @GetMapping("/goods")
     @ApiOperation(value = "商品列表", notes = "商品列表")
-    public ReturnResponse<PageVO<GoodsRowVO>> goodsList(@RequestBody QueryConditionDTO dto) {
-        return ReturnResponse.ok(goodsService.pageGoods(dto));
+    public ReturnResponse<PageVO<GoodsRowVO>> goodsList(@RequestBody GoodsQuery query) {
+        return ReturnResponse.ok(goodsService.pageGoods(query));
     }
 
 

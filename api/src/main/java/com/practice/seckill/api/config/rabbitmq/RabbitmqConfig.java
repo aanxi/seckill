@@ -37,6 +37,7 @@ public class RabbitmqConfig implements RabbitListenerConfigurer {
 
     @Autowired
     RabbitTemplate rabbitTemplate;
+
     // 提供自定义RabbitTemplate,将对象序列化为json串
     @Bean
     public RabbitTemplate jacksonRabbitTemplate(ConnectionFactory connectionFactory) {
@@ -53,6 +54,7 @@ public class RabbitmqConfig implements RabbitListenerConfigurer {
         factory.setMessageConverter(new Jackson2JsonMessageConverter());
         return factory;
     }
+
     // 可以将json串反序列化为对象
     @Override
     public void configureRabbitListeners(RabbitListenerEndpointRegistrar rabbitListenerEndpointRegistrar) {
@@ -60,26 +62,27 @@ public class RabbitmqConfig implements RabbitListenerConfigurer {
     }
 
     @Bean
-    MessageHandlerMethodFactory messageHandlerMethodFactory(){
+    MessageHandlerMethodFactory messageHandlerMethodFactory() {
         DefaultMessageHandlerMethodFactory messageHandlerMethodFactory = new DefaultMessageHandlerMethodFactory();
         messageHandlerMethodFactory.setMessageConverter(mappingJackson2MessageConverter());
         return messageHandlerMethodFactory;
     }
 
     @Bean
-    public MappingJackson2MessageConverter mappingJackson2MessageConverter(){
-        return  new MappingJackson2MessageConverter();
+    public MappingJackson2MessageConverter mappingJackson2MessageConverter() {
+        return new MappingJackson2MessageConverter();
     }
 
     /**
      * 如果发送的消息是一个对象，会使用序列化机制，由MessageConverter转换器处理，
      * 默认是WhiteListDeserializingMessageConverter，使用jdk序列化，所以这些bean必须实现Serializable接口
-     *
+     * <p>
      * 为了使用json序列化，我们需要往容器中添加一个使用json格式的MessageConverter，发送的消息会标记这个对象的全类名
-     *
+     * <p>
      * 监听队列的方法参数，可以使用Object obj来接收消息内容，通过obj.getClass()能看到真正类型是 org.springframework.amqp.core.Message
      * 所以也可以直接使用 Message me来接收，通过me.getBody()能够得到消息体
      * 如果知道消息体的本质类型，也可以直接使用 XXXEntity 来接收，
+     *
      * @return
      */
     @Bean
@@ -94,7 +97,7 @@ public class RabbitmqConfig implements RabbitListenerConfigurer {
          */
         rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
             if (ack) {
-                log.info("消息投递到交换机成功：[correlationData={}]",correlationData);
+                log.info("消息投递到交换机成功：[correlationData={}]", correlationData);
             } else {
                 log.error("消息投递到交换机失败：[correlationData={}，原因：{}]", correlationData, cause);
             }
@@ -172,7 +175,6 @@ public class RabbitmqConfig implements RabbitListenerConfigurer {
 //                OrderConstant.ORDER_CREATE_ROUTING_KEY,
 //                null);
 //    }
-
     @Bean
     public Binding inventoryDealBinding() {
         // String destination, DestinationType destinationType, String exchange, String routingKey,
@@ -186,6 +188,7 @@ public class RabbitmqConfig implements RabbitListenerConfigurer {
 
     /**
      * 秒杀消息队列和交换机的绑定关系
+     *
      * @return
      */
     @Bean

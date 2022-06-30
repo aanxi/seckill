@@ -1,6 +1,7 @@
 package com.practice.seckill.admin.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.practice.seckill.admin.bo.MemberCacheBO;
 import com.practice.seckill.admin.constant.RdsKeyGenor;
 import com.practice.seckill.admin.dto.MemberDTO;
@@ -70,13 +71,14 @@ public class MemberServiceImpl implements MemberService {
                 .lockStatus(0)
                 .createAt(dto.getCreateAt())
                 .build();
-        if(memberMapper.updateById(member) > 0) {
+        if (memberMapper.updateById(member) > 0) {
             //更新缓存
             buildMemberCacheBO(member);
             return dto;
         }
         return null;
     }
+
     @Override
     public void deleteMemberCacheBO(Long memberId) {
         String redisKey = RdsKeyGenor.memberKey(memberId);
@@ -95,7 +97,7 @@ public class MemberServiceImpl implements MemberService {
                 .id(memberId)
                 .lockStatus(1)
                 .build();
-        if(memberMapper.updateById(member) > 0) {
+        if (memberMapper.updateById(member) > 0) {
             return true;
         }
         return false;
@@ -109,7 +111,7 @@ public class MemberServiceImpl implements MemberService {
                 dto.getNickname(),
                 dto.getPhoneNumber()
         );
-        PageVO<MemberRowVO> page =  new PageVO(dto.getPageNo(), dto.getPageSize(), (long) memberList.size());
+        PageVO<MemberRowVO> page = new PageVO(dto.getPageNo(), dto.getPageSize(), (long) memberList.size());
         page.setRecords(memberList);
         return page;
     }
@@ -122,11 +124,20 @@ public class MemberServiceImpl implements MemberService {
                 .phoneNumber(dto.getPhoneNumber())
                 .district(dto.getDistrict())
                 .lockStatus(dto.getLockStatus())
-                .createAt(dto.getCreateAt()==null? LocalDateTime.now():dto.getCreateAt())
+                .createAt(dto.getCreateAt() == null ? LocalDateTime.now() : dto.getCreateAt())
                 .build();
         memberMapper.insert(newMember);
         dto.setId(newMember.getId());
         return dto;
+    }
+
+    @Override
+    public Member loginVerify(String accountId, String password) {
+        Member member = memberMapper.selectOne(new QueryWrapper<Member>()
+                .eq("account_id", accountId)
+
+        );
+        return member;
     }
 
 }

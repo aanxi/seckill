@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class SeckillServiceImpl implements SeckillService {
-    
+
     @Autowired
     RabbitTemplate rabbitTemplate;
 
@@ -65,19 +65,20 @@ public class SeckillServiceImpl implements SeckillService {
 
     /**
      * 上架最近三天参与秒杀的活动以及商品
+     *
      * @return
      */
     @Override
     public boolean uploadLatest3DaysSeckillGoods() throws Exception {
         // 查询当前时间的未来三天内开始的秒杀活动和商品
-        List<SeckillAct> actList = seckillActMapper.selectList(new QueryWrapper<SeckillAct>().between("begin_time",LocalDateTime.now(),LocalDateTime.now().plusDays(3)));
-        
+        List<SeckillAct> actList = seckillActMapper.selectList(new QueryWrapper<SeckillAct>().between("begin_time", LocalDateTime.now(), LocalDateTime.now().plusDays(3)));
+
         if (actList.size() == 0) {
             log.error("最近三天无秒杀活动");
             throw new Exception("上架秒杀活动信息失败");
         }
         List<SeckillActDTO> actDTOList = new ArrayList<>();
-        for(SeckillAct act: actList) {
+        for (SeckillAct act : actList) {
             SeckillActDTO actDTO = new SeckillActDTO();
             BeanUtils.copyProperties(act, actDTO);
             actDTOList.add(actDTO);
@@ -91,6 +92,7 @@ public class SeckillServiceImpl implements SeckillService {
 
     /**
      * 秒杀
+     *
      * @param parameterDTO
      */
     @Override
@@ -143,23 +145,23 @@ public class SeckillServiceImpl implements SeckillService {
         String lockKey = SeckillConstant.LOCK_ORDER_KEY_PREFIX + parameterDTO.getMemberId();
         RLock lock = redissonClient.getLock(lockKey);
         boolean success = lock.tryLock(10, TimeUnit.SECONDS);
-        if(!success) {
+        if (!success) {
             throw new Exception("秒杀失败，获取锁超时");
         }
         try {
             // 校验数量是否合法
             Integer inventory = Integer.valueOf(stringRedisTemplate.opsForValue().get(inventoryKey));
-            log.info("redis库存量："+inventory);
-            //扣减redis库存
+            log.info("redis库存量：" + inventory);
+            //扣减redis库存,decrement方法保证操作的原子性
             Long res = stringRedisTemplate.opsForValue().decrement(inventoryKey, parameterDTO.getCount());
-            if(res >= 0) {
+            //判断扣减后的库存是否大于等于0
+            if (res >= 0) {
                 return createSeckillOrder(parameterDTO.getMemberId(), redisBO, parameterDTO.getCount());
-            }
-            else {
+            } else {
                 throw new Exception("秒杀失败，购买数量超出数量限制");
             }
         } finally {
-            if(lock.isLocked() && lock.isHeldByCurrentThread()){ // 是否还是锁定状态
+            if (lock.isLocked() && lock.isHeldByCurrentThread()) { // 是否还是锁定状态
                 lock.unlock(); // 释放锁
             }
         }
@@ -167,17 +169,18 @@ public class SeckillServiceImpl implements SeckillService {
 
     /**
      * 快速创建秒杀订单
+     *
      * @param redisBO
      * @param count
      * @return
      */
-    private SeckillOrderDTO createSeckillOrder(Long memberId,SeckillGoodsRedisBO redisBO, Integer count) {
+    private SeckillOrderDTO createSeckillOrder(Long memberId, SeckillGoodsRedisBO redisBO, Integer count) {
         SeckillOrderDTO orderDTO = new SeckillOrderDTO();
-        orderDTO.setId(Long.valueOf(orderMapper.selectCount(new QueryWrapper<>())+1));
+        orderDTO.setId(Long.valueOf(orderMapper.selectCount(new QueryWrapper<>()) + 1));
         orderDTO.setMemberId(memberId);
         orderDTO.setGoodsId(redisBO.getGoodsId());
         orderDTO.setGoodsNumber(count);
-        orderDTO.setConsumption(count*redisBO.getSeckillPrice());
+        orderDTO.setConsumption(count * redisBO.getSeckillPrice());
         orderDTO.setCreateAt(LocalDateTime.now());
         // 发送消息到订单处理mq，订单服务后台处理
         try {
@@ -191,7 +194,7 @@ public class SeckillServiceImpl implements SeckillService {
 
     /**
      * 保存秒杀活动库存信息
-     * key:actId+goodsId  
+     * key:actId+goodsId
      * value:inventory
      */
     private void saveSeckillAct(List<SeckillActDTO> actList) {
@@ -204,28 +207,29 @@ public class SeckillServiceImpl implements SeckillService {
             if (stringRedisTemplate.hasKey(key1) || stringRedisTemplate.hasKey(key2)) {
                 continue;
             }
-            stringRedisTemplate.opsForValue().set(key1,seckillActDTO.getGoodsId().toString());
+            stringRedisTemplate.opsForValue().set(key1, seckillActDTO.getGoodsId().toString());
             // 值为当前场次下goodsid，有的sku在多个场次中都有，所以保存成 场次id_goodsid
             String inventory = goodsMapper.selectGoodsInventoryAndLock(seckillActDTO.getGoodsId()).toString();
-            stringRedisTemplate.opsForValue().set(key2,inventory);
+            stringRedisTemplate.opsForValue().set(key2, inventory);
             // 设置过期时间，活动结束自动过期,ms
-            stringRedisTemplate.expireAt(key1,Date.from(endTime.atZone(ZoneId.systemDefault()).toInstant()));
-            stringRedisTemplate.expireAt(key2,Date.from(endTime.atZone(ZoneId.systemDefault()).toInstant()));
+            stringRedisTemplate.expireAt(key1, Date.from(endTime.atZone(ZoneId.systemDefault()).toInstant()));
+            stringRedisTemplate.expireAt(key2, Date.from(endTime.atZone(ZoneId.systemDefault()).toInstant()));
         }
     }
 
     /**
      * 提前锁定库存。
      * 保存每个秒杀活动中商品详细信息以及库存(信号量形式)
-     *
+     * <p>
      * hash结构 ：seckill:goods: 场次id_goodsid->goodsinfo
-     *
+     * <p>
      * 库存以信号量形式保存
      */
     private void saveSeckillGoods(List<SeckillActDTO> actDTOList) throws InterruptedException {
         BoundHashOperations<String, String, String> ops = stringRedisTemplate.boundHashOps(SeckillConstant.REDIS_SECKILL_GOODS_INFO_KEY);
         for (SeckillActDTO actDTO : actDTOList) {
-            String key = actDTO.getId() + "_" + actDTO.getGoodsId();;
+            String key = actDTO.getId() + "_" + actDTO.getGoodsId();
+            ;
             // 当前商品信息已上架
             if (ops.hasKey(key)) {
                 continue;

@@ -23,8 +23,12 @@ public interface GoodsMapper extends BaseMapper<Goods> {
             @Param("endTime") LocalDateTime endTime,
             @Param("goodsStatus") Integer goodsStatus,
             @Param("recommended") Integer recommended);
+
     Integer selectGoodsInventoryAndLock(@Param("goodsId") Long goodsId);
+
     Integer selectGoodsSalesAndLock(@Param("goodsId") Long goodsId);
+
     Integer updateInventoryAndSalesById(@Param("goodsId") Long goodsId, @Param("newInventory") Integer newInventory, @Param("newSales") Integer newSales);
+
     Long getMaxId();
 }
