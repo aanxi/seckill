@@ -2,6 +2,7 @@ package com.practice.seckill.api.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
@@ -17,6 +18,7 @@ import com.practice.seckill.api.dto.SeckillParameterDTO;
 import com.practice.seckill.api.mapper.OrderMapper;
 import com.practice.seckill.api.mapper.SeckillActMapper;
 import com.practice.seckill.api.service.SeckillService;
+import com.practice.seckill.api.vo.SeckillGoodsVO;
 import com.practice.seckill.common.constant.OrderConstant;
 
 import com.practice.seckill.common.entity.Goods;
@@ -165,6 +167,13 @@ public class SeckillServiceImpl implements SeckillService {
                 lock.unlock(); // 释放锁
             }
         }
+    }
+
+    @Override
+    public PageSeckillGoodsVO SeckillGoodsList() {
+        //获取商品id列表
+        List<Long> ids = seckillActMapper.selectSeckillGoodsIds();
+
     }
 
     /**

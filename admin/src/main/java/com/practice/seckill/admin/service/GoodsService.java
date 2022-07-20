@@ -3,7 +3,7 @@ package com.practice.seckill.admin.service;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.practice.seckill.admin.dto.GoodsDTO;
-import com.practice.seckill.admin.dto.GoodsQuery;
+import com.practice.seckill.admin.dto.GoodsQueryConditionDTO;
 import com.practice.seckill.admin.vo.GoodsRowVO;
 import com.practice.seckill.admin.vo.PageVO;
 import com.practice.seckill.common.bo.GoodsCacheBO;
@@ -68,7 +68,7 @@ public interface GoodsService extends BaseMapper<Goods> {
      *
      * @return page
      */
-    PageVO<GoodsRowVO> pageGoods(GoodsQuery query);
+    PageVO<GoodsRowVO> pageGoods(GoodsQueryConditionDTO query);
 
     /**
      * 删除商品

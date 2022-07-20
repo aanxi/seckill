@@ -2,7 +2,7 @@ package com.practice.seckill.admin.controller;
 
 
 import com.practice.seckill.admin.dto.GoodsDTO;
-import com.practice.seckill.admin.dto.GoodsQuery;
+import com.practice.seckill.admin.dto.GoodsQueryConditionDTO;
 import com.practice.seckill.admin.service.GoodsService;
 import com.practice.seckill.admin.vo.GoodsRowVO;
 import com.practice.seckill.admin.vo.PageVO;
@@ -43,7 +43,7 @@ public class GoodsController {
 
     @GetMapping("/goods")
     @ApiOperation(value = "商品列表", notes = "商品列表")
-    public ReturnResponse<PageVO<GoodsRowVO>> goodsList(@RequestBody GoodsQuery query) {
+    public ReturnResponse<PageVO<GoodsRowVO>> goodsList(@RequestBody GoodsQueryConditionDTO query) {
         return ReturnResponse.ok(goodsService.pageGoods(query));
     }
 

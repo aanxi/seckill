@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.practice.seckill.admin.constant.RdsKeyGenor;
 import com.practice.seckill.admin.dto.GoodsDTO;
-import com.practice.seckill.admin.dto.QueryConditionDTO;
+import com.practice.seckill.admin.dto.GoodsQueryConditionDTO;
 import com.practice.seckill.admin.mapper.GoodsMapper;
 import com.practice.seckill.admin.service.GoodsService;
 import com.practice.seckill.admin.vo.GoodsRowVO;
@@ -121,7 +121,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public PageVO<GoodsRowVO> pageGoods(QueryConditionDTO dto) {
+    public PageVO<GoodsRowVO> pageGoods(GoodsQueryConditionDTO dto) {
         List<GoodsRowVO> goodsList = goodsMapper.listGoods(dto.getCategoryId(),
                 dto.getGoodsName(),
                 dto.getPriceLowerBound(),

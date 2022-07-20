@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @ApiModel("查询条件DTO")
 @Builder
 @Data
-public class GoodsQuery {
+public class GoodsQueryConditionDTO {
     @ApiModelProperty(value = "分类")
     private Long categoryId;
     @ApiModelProperty(value = "商品名称")
