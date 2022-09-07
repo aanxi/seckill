@@ -1,1 +1,528 @@
-
+swagger: "2.0"
+info:
+  description: "本文档描述接口测试用例"
+  version: "1.0"
+  title: "接口文档"
+host: "localhost:8081"
+basePath: "/seckill"
+tags:
+  -
+    name: "机构"
+    description: "Organization Controller"
+  -
+    name: "用户"
+    description: "User Controller"
+paths:
+  "/api/v1/organizations":
+    get:
+      tags:
+        -
+      "机构"
+      summary: "获取所有机构列表"
+      operationId: getAllOrganizationUsingGET
+      produces:
+        -
+      "*/*"
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              "$ref": "#/definitions/机构"
+              originalRef: "机构"
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: "Not Found"
+      deprecated: false
+    post:
+      tags:
+        -
+      "机构"
+      summary: "创建机构"
+      operationId: createOrganizationUsingPOST
+      consumes:
+        -
+      "application/json"
+      produces:
+        -
+      "*/*"
+      parameters:
+        -
+      in: body
+        name: organizationRequest
+        description: organizationRequest
+        required: true
+        schema:
+          "$ref": "#/definitions/OrganizationRequest"
+          originalRef: OrganizationRequest
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/ResponseEntity"
+            originalRef: ResponseEntity
+        201:
+          description: Created
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: "Not Found"
+      deprecated: false
+  "/api/v1/organizations/{id}":
+    get:
+      tags:
+        -
+      "机构"
+      summary: "根据id获取机构"
+      operationId: getOrganizationUsingGET
+      produces:
+        -
+      "*/*"
+      parameters:
+        -
+      name: id
+        in: path
+        description: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/机构"
+            originalRef: "机构"
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: "Not Found"
+      deprecated: false
+    put:
+      tags:
+        -
+      "机构"
+      summary: "更新机构信息"
+      operationId: updateOrganizationUsingPUT
+      consumes:
+        -
+      "application/json"
+      produces:
+        -
+      "*/*"
+      parameters:
+        -
+      name: id
+        in: path
+        description: id
+        required: true
+        type: string
+        -
+      in: body
+        name: organizationRequest
+        description: organizationRequest
+        required: true
+        schema:
+          "$ref": "#/definitions/OrganizationRequest"
+          originalRef: OrganizationRequest
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/ResponseEntity"
+            originalRef: ResponseEntity
+        201:
+          description: Created
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: "Not Found"
+      deprecated: false
+    delete:
+      tags:
+        -
+      "机构"
+      summary: "删除机构"
+      operationId: deleteOrganizationUsingDELETE
+      produces:
+        -
+      "*/*"
+      parameters:
+        -
+      name: id
+        in: path
+        description: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/ResponseEntity"
+            originalRef: ResponseEntity
+        204:
+          description: "No Content"
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+      deprecated: false
+  "/getAllUsers":
+    get:
+      tags:
+        -
+      "用户"
+      summary: "获取所有用户列表"
+      operationId: getAllUsingGET
+      produces:
+        -
+      "*/*"
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              "$ref": "#/definitions/用户"
+              originalRef: "用户"
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: "Not Found"
+      deprecated: false
+  "/getUser/{userId}":
+    get:
+      tags:
+        -
+      "用户"
+      summary: "根据id获取用户"
+      operationId: getUsingGET
+      produces:
+        -
+      "*/*"
+      parameters:
+        -
+      name: userId
+        in: path
+        description: userId
+        required: true
+        type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            "$ref": "#/definitions/用户"
+            originalRef: "用户"
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: "Not Found"
+      deprecated: false
+definitions:
+  OrganizationRequest:
+    type: object
+    properties:
+      address:
+        type: string
+      adoptionPetCounts:
+        type: integer
+        format: int32
+      city:
+        type: string
+      description:
+        type: string
+      district:
+        type: string
+      establishDate:
+        type: string
+        format: "date-time"
+      icon:
+        type: string
+      lastPostPlacementVisitDate:
+        type: string
+        format: "date-time"
+      lastPostPlacementVisitPetId:
+        type: string
+      name:
+        type: string
+      organizationFromAddress:
+        type: string
+      phoneNumber:
+        type: string
+      postPlacementVisitCounts:
+        type: integer
+        format: int32
+      province:
+        type: string
+      representativeUserId:
+        type: string
+      rescuePetCounts:
+        type: integer
+        format: int32
+      statusFlag:
+        type: boolean
+      volunteerCounts:
+        type: integer
+        format: int32
+      wechatOfficialAccountId:
+        type: string
+      welfare:
+        type: string
+    title: OrganizationRequest
+  ResponseEntity:
+    type: object
+    properties:
+      body:
+        type: object
+      statusCode:
+        type: string
+        enum:
+          -
+      "100 CONTINUE"
+      -
+      "101 SWITCHING_PROTOCOLS"
+      -
+      "102 PROCESSING"
+      -
+      "103 CHECKPOINT"
+      -
+      "200 OK"
+      -
+      "201 CREATED"
+      -
+      "202 ACCEPTED"
+      -
+      "203 NON_AUTHORITATIVE_INFORMATION"
+      -
+      "204 NO_CONTENT"
+      -
+      "205 RESET_CONTENT"
+      -
+      "206 PARTIAL_CONTENT"
+      -
+      "207 MULTI_STATUS"
+      -
+      "208 ALREADY_REPORTED"
+      -
+      "226 IM_USED"
+      -
+      "300 MULTIPLE_CHOICES"
+      -
+      "301 MOVED_PERMANENTLY"
+      -
+      "302 FOUND"
+      -
+      "302 MOVED_TEMPORARILY"
+      -
+      "303 SEE_OTHER"
+      -
+      "304 NOT_MODIFIED"
+      -
+      "305 USE_PROXY"
+      -
+      "307 TEMPORARY_REDIRECT"
+      -
+      "308 PERMANENT_REDIRECT"
+      -
+      "400 BAD_REQUEST"
+      -
+      "401 UNAUTHORIZED"
+      -
+      "402 PAYMENT_REQUIRED"
+      -
+      "403 FORBIDDEN"
+      -
+      "404 NOT_FOUND"
+      -
+      "405 METHOD_NOT_ALLOWED"
+      -
+      "406 NOT_ACCEPTABLE"
+      -
+      "407 PROXY_AUTHENTICATION_REQUIRED"
+      -
+      "408 REQUEST_TIMEOUT"
+      -
+      "409 CONFLICT"
+      -
+      "410 GONE"
+      -
+      "411 LENGTH_REQUIRED"
+      -
+      "412 PRECONDITION_FAILED"
+      -
+      "413 PAYLOAD_TOO_LARGE"
+      -
+      "413 REQUEST_ENTITY_TOO_LARGE"
+      -
+      "414 URI_TOO_LONG"
+      -
+      "414 REQUEST_URI_TOO_LONG"
+      -
+      "415 UNSUPPORTED_MEDIA_TYPE"
+      -
+      "416 REQUESTED_RANGE_NOT_SATISFIABLE"
+      -
+      "417 EXPECTATION_FAILED"
+      -
+      "418 I_AM_A_TEAPOT"
+      -
+      "419 INSUFFICIENT_SPACE_ON_RESOURCE"
+      -
+      "420 METHOD_FAILURE"
+      -
+      "421 DESTINATION_LOCKED"
+      -
+      "422 UNPROCESSABLE_ENTITY"
+      -
+      "423 LOCKED"
+      -
+      "424 FAILED_DEPENDENCY"
+      -
+      "425 TOO_EARLY"
+      -
+      "426 UPGRADE_REQUIRED"
+      -
+      "428 PRECONDITION_REQUIRED"
+      -
+      "429 TOO_MANY_REQUESTS"
+      -
+      "431 REQUEST_HEADER_FIELDS_TOO_LARGE"
+      -
+      "451 UNAVAILABLE_FOR_LEGAL_REASONS"
+      -
+      "500 INTERNAL_SERVER_ERROR"
+      -
+      "501 NOT_IMPLEMENTED"
+      -
+      "502 BAD_GATEWAY"
+      -
+      "503 SERVICE_UNAVAILABLE"
+      -
+      "504 GATEWAY_TIMEOUT"
+      -
+      "505 HTTP_VERSION_NOT_SUPPORTED"
+      -
+      "506 VARIANT_ALSO_NEGOTIATES"
+      -
+      "507 INSUFFICIENT_STORAGE"
+      -
+      "508 LOOP_DETECTED"
+      -
+      "509 BANDWIDTH_LIMIT_EXCEEDED"
+      -
+      "510 NOT_EXTENDED"
+      -
+      "511 NETWORK_AUTHENTICATION_REQUIRED"
+      statusCodeValue:
+        type: integer
+        format: int32
+    title: ResponseEntity
+  "机构":
+    type: object
+    properties:
+      address:
+        type: string
+      adoptionPetCounts:
+        type: integer
+        format: int32
+      city:
+        type: string
+      createdTime:
+        type: string
+        format: "date-time"
+      description:
+        type: string
+      district:
+        type: string
+      establishDate:
+        type: string
+        format: "date-time"
+      icon:
+        type: string
+      id:
+        type: string
+      lastPostPlacementVisitDate:
+        type: string
+        format: "date-time"
+      lastPostPlacementVisitPetId:
+        type: string
+      name:
+        type: string
+      organizationFromAddress:
+        type: string
+      phoneNumber:
+        type: string
+      postPlacementVisitCounts:
+        type: integer
+        format: int32
+      province:
+        type: string
+      representativeUserId:
+        type: string
+      rescuePetCounts:
+        type: integer
+        format: int32
+      statusFlag:
+        type: boolean
+      updatedTime:
+        type: string
+        format: "date-time"
+      volunteerCounts:
+        type: integer
+        format: int32
+      wechatOfficialAccountId:
+        type: string
+      welfare:
+        type: string
+    title: "机构"
+    description: "机构organization"
+  "用户":
+    type: object
+    properties:
+      applicationFlag:
+        type: boolean
+      blacklistFlag:
+        type: boolean
+      createdTime:
+        type: string
+        format: "date-time"
+      currentCity:
+        type: string
+      currentProvince:
+        type: string
+      emailAddress:
+        type: string
+      id:
+        type: string
+      identificationNumber:
+        type: string
+      mobileNumber:
+        type: string
+      openId:
+        type: string
+      unionId:
+        type: string
+      updatedTime:
+        type: string
+        format: "date-time"
+      userRole:
+        type: integer
+        format: int32
+      wechatId:
+        type: string
+      wechatName:
+        type: string
+    title: "用户"
+    description: "用户user"
