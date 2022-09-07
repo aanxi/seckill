@@ -169,12 +169,12 @@ public class SeckillServiceImpl implements SeckillService {
         }
     }
 
-    @Override
-    public PageSeckillGoodsVO SeckillGoodsList() {
-        //获取商品id列表
-        List<Long> ids = seckillActMapper.selectSeckillGoodsIds();
-
-    }
+//    @Override
+//    public PageSeckillGoodsVO SeckillGoodsList() {
+//        //获取商品id列表
+//        List<Long> ids = seckillActMapper.selectSeckillGoodsIds();
+//
+//    }
 
     /**
      * 快速创建秒杀订单

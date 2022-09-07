@@ -25,10 +25,10 @@ public interface SeckillService extends BaseMapper<SeckillAct> {
      */
     SeckillOrderDTO seckillItem(SeckillParameterDTO parameterDTO) throws Exception;
 
-    /**
-    * @Description 获取未开始的和正在进行的秒杀商品列表，利用定时任务将秒杀活动的状态改变
-    * @Param
-    * @return
-    */
-    SeckillGoodsVO SeckillGoodsList();
+//    /**
+//    * @Description 获取未开始的和正在进行的秒杀商品列表，利用定时任务将秒杀活动的状态改变
+//    * @Param
+//    * @return
+//    */
+//    SeckillGoodsVO SeckillGoodsList();
 }
